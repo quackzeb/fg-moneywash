@@ -38,10 +38,10 @@ Config.moneywash = {
     maxwash = 10000 -- Max washing at a time, put to like a billion for unlimited
 }
 ```
-Tax = The amount lost after money wash, if you don't want any loss put it to 1.
-Cooldown = The amount of time the player has to wait until doing the next wash.
-Washtime = The amount of time the player has to wait during wash.
-Maxwash = The max amount of dirty money that can be washed at a time, put to billion if unlimited.
+- Tax = The amount lost after money wash, if you don't want any loss put it to 1.
+- Cooldown = The amount of time the player has to wait until doing the next wash.
+- Washtime = The amount of time the player has to wait during wash.
+- Maxwash = The max amount of dirty money that can be washed at a time, put to billion if unlimited.
 
 # Support
 If you need any support or have any suggestions for the script, please dm froggy_.s on discord.
