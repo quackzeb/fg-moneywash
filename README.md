@@ -1,5 +1,5 @@
-# fg_coke
-I'm new to coding, made a simple coke script for qbcore. here it is - hopefully it helps someone.
+# fg-moneywash
+I'm new to coding, made an advnaced moneywash script for qbcore. here it is - hopefully it helps someone.
 
 # Dependencies
 - [ox_target](https://github.com/overextended/ox_target/releases/tag/v1.16.0)
