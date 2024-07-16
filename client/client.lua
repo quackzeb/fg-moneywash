@@ -1,5 +1,6 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local ox_target = exports.ox_target
+local donedebug = false
 
 local function cooldown()
 	WashCooldown = true
@@ -7,13 +8,31 @@ local function cooldown()
 	WashCooldown = false
 end
 
-function WashMoney(count)
+function search()
+local src = source
+local keycard = exports.ox_inventory:Search("count", "laundrymat_keycard")
+local ped = PlayerPedId()
+local pedPos = GetEntityCoords(ped)
+local targetPos = vec3(1122.25, -3194.48, -40.4)
+local distance = #(pedPos - targetPos)
+
+if distance > 10 then
+	donedebug = false
+	TriggerServerEvent("fg:moneywash:server:failedebug", src, donedebug)
+else
+	if keycard >= 1 then
+		donedebug = true
+		TriggerEvent("fg:moneywash:client:startwash")
+		end
+	end
+end
+
+local function startwash()
 	iswashing = true
 	lib.notify({
 		description = "You have started washing",
 		type = "inform",
 	})
-	local key = exports.ox_inventory:Search("count", "laundrymat_keycard")
 	if
 		lib.progressBar({
 			duration = Config.moneywash.washtime * 600,
@@ -27,10 +46,12 @@ function WashMoney(count)
 			},
 		})
 		then
+			print("test?")
+			TriggerServerEvent("fg:moneywash:server:removedirty", count)
+			TriggerServerEvent("fg:moneywash:server:clean", count, donedebug)
 			iswashing = false
-			TriggerServerEvent("fg:moneywash:server:addclean", "money", count)
 			cooldown()
-	end
+		end
 end
 
 function enterlaundry() 
@@ -75,11 +96,9 @@ AddEventHandler("fg:moneywash:client:startwash", function()
 	local input = lib.inputDialog('Washing Amount', {
 		{type = 'number', label = 'How much would you like to wash?'},
 	})
+	count = input[1]
 if not WashCooldown then
 	if not iswashing then
-		SetEntityHeading(PlayerPedId(), 349.9048)
-		lib.requestAnimDict('anim@gangops@facility@servers@bodysearch@', 10)
-		TaskPlayAnim(PlayerPedId(), 'anim@gangops@facility@servers@bodysearch@', 'player_search', 8.0, -8.0, -1, 48, 0)
 		if input[1] > Config.moneywash.maxwash then
 			lib.notify({
 				description = "You can't do that much at a time",
@@ -96,19 +115,9 @@ if not WashCooldown then
 				type = "error",
 			})
 		elseif input[1] < p_dirtymoney then
-			lib.notify({
-				description = "Successfully washing",
-				type = "success",
-			})
-			TriggerServerEvent("fg:moneywash:server:removedirty", "black_money" , input[1])
-			WashMoney(input[1])
+			startwash(donedebug)
 		else 
-			lib.notify({
-				description = "Successfully washing",
-				type = "success",
-			})
-			TriggerServerEvent("fg:moneywash:server:removedirty", "black_money" , input[1])
-			WashMoney(input[1])
+			startwash(donedebug)
 		end
 	elseif iswashing then
 			lib.notify({
@@ -133,9 +142,11 @@ Citizen.CreateThread(function()
 		drawSprite = true,
 		options = {{
 			name = "Money Wash",
-			event = "fg:moneywash:client:startwash",
 			icon = "fa-solid fa-money-bill",
-			label = "Wash Money"
+			label = "Wash Money",
+			onSelect = function()
+					search()
+			end
 			}}
 		})
 	ox_target:addSphereZone({
